@@ -1,0 +1,5 @@
+Develop for Azure Files with .NET
+https://learn.microsoft.com/en-us/azure/storage/files/storage-dotnet-how-to-use-files
+
+Azure Storage samples using .NET client libraries
+https://learn.microsoft.com/en-us/azure/storage/common/storage-samples-dotnet
