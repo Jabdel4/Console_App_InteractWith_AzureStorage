@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolaAppAzureFileShare", "ConsolaAppAzureFileShare.csproj", "{AC1BC851-C7FF-46DC-AE16-DF148327278C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppAzureFileShare", "ConsoleAppAzureFileShare.csproj", "{1C98AE96-31BE-4BBA-9DC3-833894BA5182}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AC1BC851-C7FF-46DC-AE16-DF148327278C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC1BC851-C7FF-46DC-AE16-DF148327278C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC1BC851-C7FF-46DC-AE16-DF148327278C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC1BC851-C7FF-46DC-AE16-DF148327278C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C98AE96-31BE-4BBA-9DC3-833894BA5182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C98AE96-31BE-4BBA-9DC3-833894BA5182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C98AE96-31BE-4BBA-9DC3-833894BA5182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C98AE96-31BE-4BBA-9DC3-833894BA5182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A9191DB7-267A-4038-928B-B1C77D949280}
+		SolutionGuid = {A80FCD7A-6987-4709-8445-1B1D789CAEDA}
 	EndGlobalSection
 EndGlobal
