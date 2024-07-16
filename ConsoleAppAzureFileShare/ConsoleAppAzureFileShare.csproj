@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<UserSecretsId>77e607be-1568-44dc-8600-d5429e6b9feb</UserSecretsId>
+	<StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

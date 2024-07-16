@@ -12,4 +12,6 @@ It realizes some actions like:
 + Create a snapshot of a file share.
 + Restore a file from a share snapshot.
 
+For security purposes, I use a nuget package named __Microsoft.Extensions.Configuration.UserSecrets__ to keep my storage account credentials secret.
+
 For this project, I provide some useful links to help anybody to have a solid understanding of how to create and interact with Azure File Share programmatically.
