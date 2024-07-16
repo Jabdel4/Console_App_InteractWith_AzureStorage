@@ -16,60 +16,84 @@ namespace ConsoleAppAzureFileShare
 {
     internal class Program
     {
-        // Create a file share
-        public async Task CreateShareAsync(string shareName)
+        public class Tasks
         {
-            var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
-            var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
-
-            ShareClient share = new ShareClient(connectionString, shareName);
-
-            await share.CreateIfNotExistsAsync(); // Create a share if it don't already exist
-
-            //Ensure that the share exists
-            if (await share.ExistsAsync())
+            // Create a file share
+            public async Task CreateShareAsync(string shareName)
             {
-                Console.WriteLine($"Share created: {share.Name}");
+                var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+                var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
 
-                // Check this existing directory
-                ShareDirectoryClient directory = share.GetDirectoryClient("TestDirectory");
+                ShareClient share = new ShareClient(connectionString, shareName);
+                Console.WriteLine("Connection to Azure Storage succeeded...");
 
-                // Create it if it doesn't already exist
-                await directory.CreateIfNotExistsAsync();
+                Console.WriteLine("Create a new File Share");
+                await share.CreateIfNotExistsAsync(); // Create a share if it don't already exist
 
-                // Ensure that the directory exists before checking/creating a file
-                if (await directory.ExistsAsync())
+                //Ensure that the share exists
+                if (await share.ExistsAsync())
                 {
-                    ShareFileClient file = directory.GetFileClient("test1.txt");
+                    Console.WriteLine($"Share created: {share.Name} is used.");
 
-                   if (await file.ExistsAsync())
+                    // Check this existing directory
+                    Console.WriteLine("Enter a directory name");
+                    var directoryName = Console.ReadLine();
+                    ShareDirectoryClient directory = share.GetDirectoryClient(directoryName);
+
+                    // Create it if it doesn't already exist
+                    Console.WriteLine($"Create a new directory named {directoryName}.");
+                    await directory.CreateIfNotExistsAsync();
+                    Console.WriteLine($"{directoryName} created successfully.");
+
+                    // Ensure that the directory exists before checking/creating a file
+                    if (await directory.ExistsAsync())
                     {
-                        Console.WriteLine($"File exists: {file.Name}");
+                        Console.WriteLine($"Directory created: {directory.Name} is used.");
 
-                        // Download the file
-                        ShareFileDownloadInfo download = await file.DownloadAsync();
+                        Console.WriteLine("Enter a file name");
+                        var fileName = Console.ReadLine();
+                        ShareFileClient file = directory.GetFileClient(fileName);
 
-                        // Save the data to a local file
-                        using (FileStream stream = File.OpenWrite(@"downloadedTest1.txt"))
+                        if (await file.ExistsAsync())
                         {
-                            await download.Content.CopyToAsync(stream);
-                            await stream.FlushAsync();
-                            stream.Close();
+                            Console.WriteLine($"File exists: {file.Name}");
 
-                            // Display where the file was saved
-                            Console.WriteLine($"File downloaded: {stream.Name}");
+                            // Download the file
+                            Console.WriteLine("Download has started...");
+                            ShareFileDownloadInfo download = await file.DownloadAsync();
+
+                            // Save the data to a local file
+                            using (FileStream stream = File.OpenWrite(@"downloadedTest1.txt"))
+                            {
+                                await download.Content.CopyToAsync(stream);
+                                await stream.FlushAsync();
+                                stream.Close();
+
+                                // Display where the file was saved
+                                Console.WriteLine($"File downloaded: {stream.Name}");
+                            }
                         }
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"CreateShareAsync failed...");
+                }
             }
         }
+        
 
 
-        // Execution
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            Console.WriteLine("Enter the name of the File Share...");
+            var shareName = Console.ReadLine();
 
-            Console.WriteLine("Hello, World!");
+            // Call the CreateShareAsync method
+            Tasks CreateFileShare = new Tasks();
+            await CreateFileShare.CreateShareAsync($"{shareName}");
+            Console.WriteLine("CreateShareAsync created...");
+            Console.ReadKey();
         }
     }
 }
