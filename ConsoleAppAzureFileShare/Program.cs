@@ -11,7 +11,6 @@ using Azure.Storage.Sas;
 using Microsoft.Extensions.Configuration;
 
 
-
 namespace ConsoleAppAzureFileShare
 {
     internal class Program
@@ -28,7 +27,7 @@ namespace ConsoleAppAzureFileShare
                 Console.WriteLine("Connection to Azure Storage succeeded...");
 
                 Console.WriteLine("Create a new File Share");
-                await share.CreateIfNotExistsAsync(); // Create a share if it don't already exist
+                await share.CreateIfNotExistsAsync(); // Create a share if it doesn't already exist
 
                 //Ensure that the share exists
                 if (await share.ExistsAsync())
@@ -38,7 +37,7 @@ namespace ConsoleAppAzureFileShare
                     // Check this existing directory
                     Console.WriteLine("Enter a directory name");
                     var directoryName = Console.ReadLine();
-                    ShareDirectoryClient directory = share.GetDirectoryClient(directoryName);
+                    ShareDirectoryClient directory = share.GetDirectoryClient($"{directoryName}");
 
                     // Create it if it doesn't already exist
                     Console.WriteLine($"Create a new directory named {directoryName}.");
@@ -52,7 +51,7 @@ namespace ConsoleAppAzureFileShare
 
                         Console.WriteLine("Enter a file name");
                         var fileName = Console.ReadLine();
-                        ShareFileClient file = directory.GetFileClient(fileName);
+                        ShareFileClient file = directory.GetFileClient($"{fileName}.txt");
 
                         if (await file.ExistsAsync())
                         {
@@ -73,6 +72,10 @@ namespace ConsoleAppAzureFileShare
                                 Console.WriteLine($"File downloaded: {stream.Name}");
                             }
                         }
+                        else
+                        {
+                            Console.WriteLine("This file doesn't exist...");
+                        }
                     }
                 }
                 else
@@ -80,8 +83,47 @@ namespace ConsoleAppAzureFileShare
                     Console.WriteLine($"CreateShareAsync failed...");
                 }
             }
+
+            // Set the maximum size of a share
+            public async Task SetMaxShareSizeAsync(string shareName, int increaseSizeInGiB)
+            {
+                const long ONE_GIBIBYTE = 10737420000; // Number of bytes in 1 gibibyte
+
+                // Get the connection string from app settings
+                var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+                var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
+
+                ShareClient share = new ShareClient(connectionString, shareName);
+
+                // Create the share if it doesn't already exist
+                await share.CreateIfNotExistsAsync();
+
+                // Ensure that the share exists
+                if (await share.ExistsAsync())
+                {
+                    // Get and display current share quota
+                    ShareProperties properties = await share.GetPropertiesAsync();
+                    Console.WriteLine($"Current share quota: {properties.QuotaInGB} GiB");
+
+                    // Get and display current usage stats for the share
+                    ShareStatistics stats = await share.GetStatisticsAsync();
+                    Console.WriteLine($"Current share usage: {stats.ShareUsageInBytes} bytes");
+
+                    // Convert current usage from bytes into GiB
+                    int currentGiB = (int)(stats.ShareUsageInBytes / ONE_GIBIBYTE);
+
+                    // This line sets the quota to be the current 
+                    // usage of the share plus the increase amount
+                    await share.SetQuotaAsync(currentGiB + increaseSizeInGiB);
+
+                    // Get the new quota and display it
+                    properties = await share.GetPropertiesAsync();
+                    Console.WriteLine($"New share quota: {properties.QuotaInGB} GiB");
+                }
+            }
+
         }
-        
+
 
 
         static async Task Main(string[] args)
@@ -92,8 +134,10 @@ namespace ConsoleAppAzureFileShare
             // Call the CreateShareAsync method
             Tasks CreateFileShare = new Tasks();
             await CreateFileShare.CreateShareAsync($"{shareName}");
-            Console.WriteLine("CreateShareAsync created...");
+            Console.WriteLine("CreateShareAsync done...");
             Console.ReadKey();
+
+            // Call the SetMaxShareSizeAsync method
         }
     }
 }
