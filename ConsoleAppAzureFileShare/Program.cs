@@ -124,29 +124,36 @@ namespace ConsoleAppAzureFileShare
             }
 
             // Generate a shared access signature for a file or file share
-            public async Task CopyFileAsync(string shareName, string sourceFilePath, string destFilePath)
+            public Uri GetFileSasUri(string shareName, string filePath, DateTime expiration, ShareFileSasPermissions permissions)
             {
                 // Get the connection string from app settings
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
 
-                // Get a reference to the file we created previously
-                ShareFileClient sourceFile = new ShareFileClient(connectionString, shareName, sourceFilePath);
-
-                // Ensure that the source file exists
-                if (await sourceFile.ExistsAsync())
+                ShareSasBuilder fileSAS = new ShareSasBuilder()
                 {
-                    // Get a reference to the destination file
-                    ShareFileClient destFile = new ShareFileClient(connectionString, shareName, destFilePath);
+                    ShareName = shareName,
+                    FilePath = filePath,
 
-                    // Start the copy operation
-                    await destFile.StartCopyAsync(sourceFile.Uri);
+                    // Specify an Azure file resource
+                    Resource = "f",
 
-                    if (await destFile.ExistsAsync())
-                    {
-                        Console.WriteLine($"{sourceFile.Uri} copied to {destFile.Uri}");
-                    }
-                }
+                    // Expires in 24 hours
+                    ExpiresOn = expiration
+                };
+
+                // Set the permissions for the SAS
+                fileSAS.SetPermissions(permissions);
+
+                // Create a SharedKeyCredential that we can use to sign the SAS token
+                StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
+
+                // Build a SAS URI
+                UriBuilder fileSasUri = new UriBuilder($"https://{accountName}.file.core.windows.net/{fileSAS.ShareName}/{fileSAS.FilePath}");
+                fileSasUri.Query = fileSAS.ToSasQueryParameters(credential).ToString();
+
+                // Return the URI
+                return fileSasUri.Uri;
             }
 
         }
