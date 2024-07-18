@@ -111,6 +111,7 @@ namespace ConsoleAppAzureFileShare
 
                     // Convert current usage from bytes into GiB
                     int currentGiB = (int)(stats.ShareUsageInBytes / ONE_GIBIBYTE);
+                    Console.WriteLine($"Current GiB: {currentGiB}");
 
                     // This line sets the quota to be the current 
                     // usage of the share plus the increase amount
@@ -131,13 +132,23 @@ namespace ConsoleAppAzureFileShare
             Console.WriteLine("Enter the name of the File Share...");
             var shareName = Console.ReadLine();
 
+            Console.WriteLine("Enter the quota of the File Share (integer)...");
+            var FileShareQuota = Convert.ToUInt16(Console.ReadLine()); // Convert the string input to int
+
             // Call the CreateShareAsync method
             Tasks CreateFileShare = new Tasks();
             await CreateFileShare.CreateShareAsync($"{shareName}");
             Console.WriteLine("CreateShareAsync done...");
+            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
 
             // Call the SetMaxShareSizeAsync method
+            Console.WriteLine("------------ SetMaxShareSizeAsync --------------");
+            Tasks MaxShareSizeAsync = new Tasks();
+            await MaxShareSizeAsync.SetMaxShareSizeAsync($"{shareName}", FileShareQuota);
+            Console.WriteLine($"The quota of {shareName} is {FileShareQuota} GiB.");
+            Console.WriteLine("SetMaxShareSizeAsync done...");
+            Console.ReadKey();
         }
     }
 }
