@@ -123,6 +123,32 @@ namespace ConsoleAppAzureFileShare
                 }
             }
 
+            // Generate a shared access signature for a file or file share
+            public async Task CopyFileAsync(string shareName, string sourceFilePath, string destFilePath)
+            {
+                // Get the connection string from app settings
+                var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+                var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
+
+                // Get a reference to the file we created previously
+                ShareFileClient sourceFile = new ShareFileClient(connectionString, shareName, sourceFilePath);
+
+                // Ensure that the source file exists
+                if (await sourceFile.ExistsAsync())
+                {
+                    // Get a reference to the destination file
+                    ShareFileClient destFile = new ShareFileClient(connectionString, shareName, destFilePath);
+
+                    // Start the copy operation
+                    await destFile.StartCopyAsync(sourceFile.Uri);
+
+                    if (await destFile.ExistsAsync())
+                    {
+                        Console.WriteLine($"{sourceFile.Uri} copied to {destFile.Uri}");
+                    }
+                }
+            }
+
         }
 
 
@@ -136,6 +162,7 @@ namespace ConsoleAppAzureFileShare
             var FileShareQuota = Convert.ToUInt16(Console.ReadLine()); // Convert the string input to int
 
             // Call the CreateShareAsync method
+            Console.WriteLine("------------ CreateShareAsync --------------");
             Tasks CreateFileShare = new Tasks();
             await CreateFileShare.CreateShareAsync($"{shareName}");
             Console.WriteLine("CreateShareAsync done...");
@@ -149,6 +176,9 @@ namespace ConsoleAppAzureFileShare
             Console.WriteLine($"The quota of {shareName} is {FileShareQuota} GiB.");
             Console.WriteLine("SetMaxShareSizeAsync done...");
             Console.ReadKey();
+
+
+            // Call the GetFileSasUri method
         }
     }
 }
