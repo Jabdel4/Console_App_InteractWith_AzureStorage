@@ -128,7 +128,8 @@ namespace ConsoleAppAzureFileShare
             {
                 // Get the connection string from app settings
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
-                var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
+                var saName = config.GetSection("StorageCredentials")["StorageAccountName"];
+                var saKey = config.GetSection("StorageCredentials")["StorageAccountKey"];
 
                 ShareSasBuilder fileSAS = new ShareSasBuilder()
                 {
@@ -146,10 +147,10 @@ namespace ConsoleAppAzureFileShare
                 fileSAS.SetPermissions(permissions);
 
                 // Create a SharedKeyCredential that we can use to sign the SAS token
-                StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
+                StorageSharedKeyCredential credential = new StorageSharedKeyCredential(saName, saKey);
 
                 // Build a SAS URI
-                UriBuilder fileSasUri = new UriBuilder($"https://{accountName}.file.core.windows.net/{fileSAS.ShareName}/{fileSAS.FilePath}");
+                UriBuilder fileSasUri = new UriBuilder($"https://{saName}.file.core.windows.net/{fileSAS.ShareName}/{fileSAS.FilePath}");
                 fileSasUri.Query = fileSAS.ToSasQueryParameters(credential).ToString();
 
                 // Return the URI
