@@ -92,6 +92,7 @@ namespace ConsoleAppAzureFileShare
                 // Get the connection string from app settings
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
+                Console.WriteLine("Connection to Azure Storage succeeded...");
 
                 ShareClient share = new ShareClient(connectionString, shareName);
 
@@ -130,6 +131,7 @@ namespace ConsoleAppAzureFileShare
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var saName = config.GetSection("StorageCredentials")["StorageAccountName"];
                 var saKey = config.GetSection("StorageCredentials")["StorageAccountKey"];
+                Console.WriteLine("Connection to Azure Storage succeeded...");
 
                 ShareSasBuilder fileSAS = new ShareSasBuilder()
                 {
@@ -183,10 +185,19 @@ namespace ConsoleAppAzureFileShare
             await MaxShareSizeAsync.SetMaxShareSizeAsync($"{shareName}", FileShareQuota);
             Console.WriteLine($"The quota of {shareName} is {FileShareQuota} GiB.");
             Console.WriteLine("SetMaxShareSizeAsync done...");
+            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
 
 
             // Call the GetFileSasUri method
+            Console.WriteLine("------------ GetFileSasUri --------------");
+            Tasks FileSasUri = new Tasks();
+            var expiration = DateTime.Now.AddHours(3);
+            await FileSasUri.GetFileSasUri($"{shareName}", "/testdir001/test.txt", expiration: expiration, ShareFileSasPermissions.Read);
+            Console.WriteLine($"The generated SAS Token is: { FileSasUri.Uri} ");
+            Console.WriteLine("GetFileSasUri done...");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }
