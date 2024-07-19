@@ -128,6 +128,7 @@ namespace ConsoleAppAzureFileShare
             {
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
+                Console.WriteLine("Connection to Azure Storage succeeded...");
 
                 // Get a reference to the file we created previously
                 ShareFileClient sourceFile = new ShareFileClient(connectionString, shareName, sourceFilePath);
@@ -135,6 +136,8 @@ namespace ConsoleAppAzureFileShare
                 // Ensure that the source file exists
                 if (await sourceFile.ExistsAsync())
                 {
+                    Console.WriteLine("The source file exists");
+
                     // Get a reference to the destination file
                     ShareFileClient destFile = new ShareFileClient(connectionString, shareName, destFilePath);
 
@@ -212,6 +215,21 @@ namespace ConsoleAppAzureFileShare
             Console.WriteLine("SetMaxShareSizeAsync done...");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+
+            // Call the CopyFileAsync method
+            Console.WriteLine("------------ CopyFileAsync --------------");
+            Tasks CopyFile = new Tasks();
+            Console.WriteLine("Enter the source file path...");
+            var sourceFilePath = Console.ReadLine();
+            Console.WriteLine("Enter the destination file path...");
+            var destFilePath = Console.ReadLine();
+            Console.WriteLine("Copy is starting...");
+            await CopyFile.CopyFileAsync($"{shareName}", $"{sourceFilePath}", $"{destFilePath}");
+            Console.WriteLine("The copy is done...");
+            Console.WriteLine("CopyFileAsync done...");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+
 
 
             // Call the GetFileSasUri method
