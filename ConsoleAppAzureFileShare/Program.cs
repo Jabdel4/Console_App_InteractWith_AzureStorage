@@ -124,31 +124,50 @@ namespace ConsoleAppAzureFileShare
                 }
             }
 
+            //https://stackoverflow.com/questions/77111976/how-can-i-copy-one-file-from-one-folder-to-another-within-an-azure-fileshare-usi
+
             public async Task CopyFileAsync(string shareName, string sourceFilePath, string destFilePath)
             {
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
                 Console.WriteLine("Connection to Azure Storage succeeded...");
 
-                // Get a reference to the file we created previously
-                ShareFileClient sourceFile = new ShareFileClient(connectionString, shareName, sourceFilePath);
+                ShareClient shareClient = new ShareClient(connectionString, shareName);
+                ShareDirectoryClient sourceDir = shareClient.GetDirectoryClient(Path.GetDirectoryName(sourceFilePath));
+                ShareDirectoryClient destDir = shareClient.GetDirectoryClient(Path.GetDirectoryName(destFilePath));
 
-                // Ensure that the source file exists
-                if (await sourceFile.ExistsAsync())
+                if (await sourceDir.ExistsAsync() && await destDir.ExistsAsync())
                 {
-                    Console.WriteLine("The source file exists");
+                    ShareFileClient sourceFile = sourceDir.GetFileClient(Path.GetFileName(sourceFilePath));
+                    ShareFileClient destFile = destDir.GetFileClient(Path.GetFileName(destFilePath));
 
-                    // Get a reference to the destination file
-                    ShareFileClient destFile = new ShareFileClient(connectionString, shareName, destFilePath);
-
-                    // Start the copy operation
-                    await destFile.StartCopyAsync(sourceFile.Uri);
-
-                    if (await destFile.ExistsAsync())
+                    if (await sourceFile.ExistsAsync())
                     {
-                        Console.WriteLine($"{sourceFile.Uri} copied to {destFile.Uri}");
+                        ShareFileProperties properties = await sourceFile.GetPropertiesAsync();
+                        if (properties.CopyStatus == CopyStatus.Success)
+                        {
+                            Console.WriteLine("File already copied.");
+                        }
+                        else
+                        {
+                            await destFile.StartCopyAsync(sourceFile.Uri);
+
+                            //await WaitForCopyToCompleteAsync(destFile);
+
+                            Console.WriteLine("File copied successfully.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Source file does not exist.");
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Source or destination folder does not exist.");
+                }
+
+
             }
 
 
@@ -196,39 +215,28 @@ namespace ConsoleAppAzureFileShare
             Console.WriteLine("Enter the name of the File Share...");
             var shareName = Console.ReadLine();
 
-            Console.WriteLine("Enter the quota of the File Share (integer)...");
-            var FileShareQuota = Convert.ToUInt16(Console.ReadLine()); // Convert the string input to int
+            //Console.WriteLine("Enter the quota of the File Share (integer)...");
+            //var FileShareQuota = Convert.ToUInt16(Console.ReadLine()); // Convert the string input to int
 
-            // Call the CreateShareAsync method
-            Console.WriteLine("------------ CreateShareAsync --------------");
-            Tasks CreateFileShare = new Tasks();
-            await CreateFileShare.CreateShareAsync($"{shareName}");
-            Console.WriteLine("CreateShareAsync done...");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            //// Call the CreateShareAsync method
+            //Console.WriteLine("------------ CreateShareAsync --------------");
+            //Tasks CreateFileShare = new Tasks();
+            //await CreateFileShare.CreateShareAsync($"{shareName}");
+            //Console.WriteLine("CreateShareAsync done...");
+            //Console.WriteLine("Press any key to continue...");
+            //Console.ReadKey();
 
-            // Call the SetMaxShareSizeAsync method
-            Console.WriteLine("------------ SetMaxShareSizeAsync --------------");
-            Tasks MaxShareSizeAsync = new Tasks();
-            await MaxShareSizeAsync.SetMaxShareSizeAsync($"{shareName}", FileShareQuota);
-            Console.WriteLine($"The quota of {shareName} is {FileShareQuota} GiB.");
-            Console.WriteLine("SetMaxShareSizeAsync done...");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            //// Call the SetMaxShareSizeAsync method
+            //Console.WriteLine("------------ SetMaxShareSizeAsync --------------");
+            //Tasks MaxShareSizeAsync = new Tasks();
+            //await MaxShareSizeAsync.SetMaxShareSizeAsync($"{shareName}", FileShareQuota);
+            //Console.WriteLine($"The quota of {shareName} is {FileShareQuota} GiB.");
+            //Console.WriteLine("SetMaxShareSizeAsync done...");
+            //Console.WriteLine("Press any key to continue...");
+            //Console.ReadKey();
 
             // Call the CopyFileAsync method
-            Console.WriteLine("------------ CopyFileAsync --------------");
-            Tasks CopyFile = new Tasks();
-            Console.WriteLine("Enter the source file path...");
-            var sourceFilePath = Console.ReadLine();
-            Console.WriteLine("Enter the destination file path...");
-            var destFilePath = Console.ReadLine();
-            Console.WriteLine("Copy is starting...");
-            await CopyFile.CopyFileAsync($"{shareName}", $"{sourceFilePath}", $"{destFilePath}");
-            Console.WriteLine("The copy is done...");
-            Console.WriteLine("CopyFileAsync done...");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+
 
 
 
