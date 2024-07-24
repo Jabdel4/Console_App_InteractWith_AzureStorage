@@ -236,7 +236,17 @@ namespace ConsoleAppAzureFileShare
             //Console.ReadKey();
 
             // Call the CopyFileAsync method
-
+            Console.WriteLine("------------ CopyFileAsync --------------");
+            Tasks CopyFile = new Tasks();
+            Console.WriteLine("Enter the source file path... Like > <sourcefolder_name/sourcefile_name.txt>");
+            var sourceFilePath = Console.ReadLine();
+            Console.WriteLine("Enter the destination file path... Like > <destinationfolder_name/destinationfile_name.txt>");
+            var destFilePath = Console.ReadLine();
+            Console.WriteLine("Copy is starting...");
+            await CopyFile.CopyFileAsync($"{shareName}", $"{sourceFilePath}", $"{destFilePath}");
+            Console.WriteLine("CopyFileAsync done...");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
 
 
 
