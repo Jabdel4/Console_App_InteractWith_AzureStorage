@@ -23,7 +23,7 @@ namespace ConsoleAppAzureFileShare
                 var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
 
-                ShareClient share = new ShareClient(connectionString, shareName);
+                ShareClient share = new(connectionString, shareName);
                 Console.WriteLine("Connection to Azure Storage succeeded...");
 
                 Console.WriteLine("Create a new File Share");
@@ -94,7 +94,7 @@ namespace ConsoleAppAzureFileShare
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
                 Console.WriteLine("Connection to Azure Storage succeeded...");
 
-                ShareClient share = new ShareClient(connectionString, shareName);
+                ShareClient share = new(connectionString, shareName);
 
                 // Create the share if it doesn't already exist
                 await share.CreateIfNotExistsAsync();
@@ -132,7 +132,7 @@ namespace ConsoleAppAzureFileShare
                 var connectionString = config.GetSection("StorageCredentials")["StorageConnectionString"];
                 Console.WriteLine("Connection to Azure Storage succeeded...");
 
-                ShareClient shareClient = new ShareClient(connectionString, shareName);
+                ShareClient shareClient = new(connectionString, shareName);
                 ShareDirectoryClient sourceDir = shareClient.GetDirectoryClient(Path.GetDirectoryName(sourceFilePath));
                 ShareDirectoryClient destDir = shareClient.GetDirectoryClient(Path.GetDirectoryName(destFilePath));
 
@@ -237,7 +237,7 @@ namespace ConsoleAppAzureFileShare
 
             // Call the CopyFileAsync method
             Console.WriteLine("------------ CopyFileAsync --------------");
-            Tasks CopyFile = new Tasks();
+            Tasks CopyFile = new();
             Console.WriteLine("Enter the source file path... Like > <sourcefolder_name/sourcefile_name.txt>");
             var sourceFilePath = Console.ReadLine();
             Console.WriteLine("Enter the destination file path... Like > <destinationfolder_name/destinationfile_name.txt>");
